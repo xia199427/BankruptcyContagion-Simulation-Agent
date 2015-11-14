@@ -38,7 +38,7 @@ public class FirmAgent {
 	
 	//仅在模拟初始时调用，设置破产传染源；
 	public void setBankruptcy(){
-		this.isBankruptcy = true;
+		bankruptAction();
 	}
 	
 	public String getID(){
