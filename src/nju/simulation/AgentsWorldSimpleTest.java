@@ -9,7 +9,6 @@ import nju.agent.AgentRelations;
 import nju.agent.FirmAgent;
 
 public class AgentsWorldSimpleTest extends AgentsWorld{
-	private ArrayList<SimulationResult> simulationResults = new ArrayList<SimulationResult>();
 	
 	public static long INTERVAL = 0;
 	
@@ -85,71 +84,121 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 		
 	}
 	
-	public void initBankruptcySource(){
-		//初始化破产节点
-		int d = (int) Math.floor( Math.random() * 5 );
-		if(d == 5)
-			d = 4;
-		agents[d].setBankruptcy();
-		AgentsWorld.bankruptNum = 1;//与设置多少个破产传染源有关
+	private ArrayList<Integer> selectDistinctNums(final int n, final int len){
+		if(n == 0)
+			return null;
+		if(n == len){
+			ArrayList<Integer> temp = new ArrayList<Integer>();
+			for(int i = 0 ; i < len; i ++){
+				temp.add(i);
+			}
+			
+			return temp;
+		}
+		
+		int count = n;
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		while(count > 0){
+			//初始化破产节点
+			int d = (int) Math.floor( Math.random() * len );
+			if(d == len)
+				d = len-1;
+			
+			if(!list.contains(d)){
+				list.add(d);
+				count--;
+			}
+		}
+		
+		
+		return list;
+	}
+	
+	public void initBankruptcySource(final int n){
+		int len = agents.length;
+		if(n > len){
+			throw new OutboundException();
+		}
+		
+		if(n < len/2){
+			ArrayList<Integer> indexes = this.selectDistinctNums(n, len);
+			if(indexes == null)
+				return;
+			for(int i = 0; i < indexes.size() ;  i++){
+				int index = indexes.get(i);
+				agents[index].setBankruptcy();
+			}
+		}else{
+			int exclude_nums = len - n;
+			ArrayList<Integer> list = this.selectDistinctNums(exclude_nums, len);
+			for(int i = 0 ; i < len ; i++){
+				if(!list.contains(i)){
+					agents[i].setBankruptcy();
+				}
+			}
+		}
+		
+		AgentsWorld.bankruptNum = n;//与设置多少个破产传染源有关
 	}
 	
 	
 	public void simulate(){
-		simulationResults.clear();
+		int init_B_num = 1;
+		ExperimentData.clean();
 		
-		for(int i = 0 ; i < 100 ; i  ++){
-			init();
-			initBankruptcySource();
+		
+		for(int k = 0 ; k < 4 ; k++){
+			final int counts = 100;
+			double[] incres = new double[counts];
+			double init_R_ratio = 0;
 			
-			double init_R_ratio = this.calBankruptRatio();
+			for(int i = 0 ; i < counts ; i  ++){
+				init();
+				if(init_B_num > agents.length)
+					break;
+				
+				initBankruptcySource(init_B_num);
+				
+				init_R_ratio = this.calBankruptRatio();
+				
+				startSimulation();
+				
+				double final_R_ratio = this.calBankruptRatio();
+				double incre_R_ratio = final_R_ratio - init_R_ratio;
+				
+				incres[i] = incre_R_ratio;
+			}
+			//we have 1 init_R_ratio and 10 incre_R_ratio now
+			double incre_avg = this.calAverage(incres);
+			SimulationResult line = new SimulationResult(init_R_ratio, incre_avg);
+			ExperimentData.addData(line);
 			
-			startSimulation();
-			int turns = i+1;
-			System.out.println("第"+ turns + "次模拟结束");
-			double final_R_ratio = this.calBankruptRatio();
-			
-			SimulationResult result = new SimulationResult(init_R_ratio, final_R_ratio);
-			simulationResults.add(result);
+			//初始破产agent数增加；
+			init_B_num++;
 		}
 		
 		//用图显示结果。
-		SimulationResult[] data = new SimulationResult[simulationResults.size()];
-		simulationResults.toArray(data);
 		
-		printArray(data);
-		
+		ExperimentData.showData();
 		//plot(data);
 	}
 	
-	private void plot(SimulationResult[] data){
-		//get x,y 
-		int len = data.length;
-		double[] ax = new double[len];
-		double[] ay = new double[len];
-		
-		for(int i = 0 ; i < len ; i++){
-			SimulationResult temp = data[i];
-			ax[i] = temp.init_B_ratio;
-			ay[i] = temp.final_B_ratio;
-		}
-		
-		MWNumericArray x = new MWNumericArray(ax, MWClassID.DOUBLE);
-		MWNumericArray y = new MWNumericArray(ay, MWClassID.DOUBLE);
-	}
 	
-	private void printArray(SimulationResult[] data){
-		int len = data.length;
-		for(int i = 0 ; i < len ; i++){
-			SimulationResult turn = data[i];
-			System.out.println(turn.init_B_ratio + " --> " + turn.final_B_ratio);
-		}
-	}
 	
 	private double calBankruptRatio(){
 		int len = agents.length;
 		double ratio = ((double) AgentsWorld.bankruptNum ) / len;
 		return ratio;
+	}
+	
+	private double calAverage(double[] data){
+		double temp = 0 ;
+		int len = data.length;
+		for(int i = 0 ; i < len ; i++){
+			temp += data[i];
+		}
+		
+		return temp/len;
 	}
 
 }
