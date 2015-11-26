@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Stack;
 
 import nju.agent.msg.*;
+import nju.simulation.AgentsWorld;
 
 public class FirmAgent {
 	private String id;
@@ -13,8 +14,8 @@ public class FirmAgent {
 	private BankruptDetectCom brdCom;
 	
 	private boolean isBankruptcy = false;//是否破产
-	Stack<AbstractMessage> msg_queue = new Stack<AbstractMessage>();
-	HashMap<String,Component> register_map = new HashMap<String, Component>();
+	private Stack<AbstractMessage> msg_queue = new Stack<AbstractMessage>();
+	private HashMap<String,Component> register_map = new HashMap<String, Component>();
 	/**
 	 * 
 	 * @param id，	agent的id作为识别依据
@@ -51,9 +52,36 @@ public class FirmAgent {
 	}
 	
 	//自身破产后的行为——对周围agents 采取的动作。
-	public void bankruptAction(){
+	void bankruptAction(){
 		this.isBankruptcy = true;
+		//记录
+		AgentsWorld.bankruptNum++;
 		//TODO  向周围的agent 发送破产信息。
+		AgentRelations agentRelations = AgentRelations.getInstance();
+		
+		//往下游传递影响; 顺向
+		FirmAgent[] downstreamAgents = agentRelations.getDownstreamAgents(this.id);
+		int d_len = downstreamAgents.length;
+		for(int i = 0 ; i < d_len ; i++){
+			FirmAgent agent = downstreamAgents[i];
+			if(!agent.isBankruptcy()){
+				double value = agentRelations.getValue(this.id, agent.getID());
+				BankruptcyMessage msg = new BankruptcyMessage(this, value, false);
+				agent.informAgent(msg);
+			}
+		}
+		
+		//往上游传递影响； 逆向
+		FirmAgent[] upstreamAgents = agentRelations.getUpstreamAgents(this.id);
+		int u_len = upstreamAgents.length;
+		for(int i = 0 ; i < u_len ; i++){
+			FirmAgent agent = upstreamAgents[i];
+			if(!agent.isBankruptcy()){
+				double value = agentRelations.getValue(agent.getID(), this.id);
+				BankruptcyMessage msg = new BankruptcyMessage(this, value, true);
+				agent.informAgent(msg);
+			}
+		}
 		
 	}
 	
@@ -82,7 +110,7 @@ public class FirmAgent {
 		return register_map.get(key);
 	}
 	
-	boolean isBankruptcy(){
+	public boolean isBankruptcy(){
 		return isBankruptcy;
 	}
 
