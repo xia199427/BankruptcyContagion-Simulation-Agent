@@ -3,6 +3,7 @@ package nju.simulation;
 import nju.agent.FirmAgent;
 
 public abstract class AgentsWorld {
+	public static int timestep = 0;
 	public static int bankruptNum = 0;
 	
 	protected FirmAgent[] agents;

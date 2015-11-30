@@ -5,6 +5,7 @@ import java.util.Stack;
 
 import nju.agent.msg.*;
 import nju.simulation.AgentsWorld;
+import nju.simulation.Logger;
 
 public class FirmAgent {
 	private String id;
@@ -53,6 +54,7 @@ public class FirmAgent {
 	
 	//自身破产后的行为——对周围agents 采取的动作。
 	void bankruptAction(){
+		Logger.log_bankruptEvent(this.getID());
 		this.isBankruptcy = true;
 		//记录
 		AgentsWorld.bankruptNum++;

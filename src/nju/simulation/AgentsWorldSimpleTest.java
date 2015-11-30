@@ -1,15 +1,11 @@
 package nju.simulation;
 
+import java.io.IOException;
 import java.util.ArrayList;
-
-import com.mathworks.toolbox.javabuilder.MWClassID;
-import com.mathworks.toolbox.javabuilder.MWNumericArray;
-
 import nju.agent.AgentRelations;
 import nju.agent.FirmAgent;
 
 public class AgentsWorldSimpleTest extends AgentsWorld{
-	
 	public static long INTERVAL = 0;
 	
 	private double[][] getEmptyRelations(int len){
@@ -62,8 +58,10 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 		// TODO Auto-generated method stub
 		
 		int turnbefore_bankruptNums = 0;
+		timestep = 0;
 		while(turnbefore_bankruptNums != AgentsWorld.bankruptNum){
 			turnbefore_bankruptNums = AgentsWorld.bankruptNum;
+			timestep++;
 			try {
 				Thread.sleep(INTERVAL);
 			} catch (InterruptedException e) {
@@ -79,6 +77,8 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 			}
 			
 		}
+		
+		timestep = 0;
 		
 		System.out.println("一次模拟结束");
 		
@@ -145,7 +145,12 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 	public void simulate(){
 		int init_B_num = 1;
 		ExperimentData.clean();
-		
+		try {
+			Logger.start();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		for(int k = 0 ; k < 4 ; k++){
 			final int counts = 100;
@@ -157,11 +162,15 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 				if(init_B_num > agents.length)
 					break;
 				
+				Logger.log_startSimulation();
+				
 				initBankruptcySource(init_B_num);
 				
 				init_R_ratio = this.calBankruptRatio();
 				
 				startSimulation();
+				
+				Logger.log_endSimulation();
 				
 				double final_R_ratio = this.calBankruptRatio();
 				double incre_R_ratio = final_R_ratio - init_R_ratio;
@@ -177,6 +186,7 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 			init_B_num++;
 		}
 		
+		Logger.stop();
 		//用图显示结果。
 		
 		ExperimentData.showData();

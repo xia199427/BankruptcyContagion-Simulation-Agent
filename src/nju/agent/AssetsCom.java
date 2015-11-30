@@ -1,5 +1,7 @@
 package nju.agent;
 
+import nju.simulation.Logger;
+
 
 public class AssetsCom extends Component{
 	private final double origin_c;
@@ -25,10 +27,12 @@ public class AssetsCom extends Component{
 	
 	public void addCash(double cash){
 		this.c += cash;
+		Logger.log_action(agent.getID(), cash +" Cash Added, now we have: " + this.c);
 	}
 	
 	public void minusCash(double cash){
 		this.c -= cash;
+		Logger.log_action(agent.getID(), cash + " substracted, now we have: " + this.c);
 	}
 	
 	public double getCurrent_C(){
@@ -42,8 +46,10 @@ public class AssetsCom extends Component{
 		double temp_incre = (origin_c - c) / k;
 		if(temp_incre > e){
 			this.c += temp_incre;
+			Logger.log_action(agent.getID(), "auto recovery: " + temp_incre + ", now we have " + this.c);
 		}else{
 			this.c += e;
+			Logger.log_action(agent.getID(), "auto recovery: " + e + ", now we hava " + this.c);
 		}
 		
 	}
