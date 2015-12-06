@@ -55,6 +55,8 @@ public class Logger {
 	
 	public static void stop(){
 		isClose = true;
+		if(queue.isEmpty())
+			queue.add("\r\n");
 	}
 
 	public static void log_startSimulation(){
