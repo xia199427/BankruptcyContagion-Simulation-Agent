@@ -86,7 +86,7 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 	
 	private ArrayList<Integer> selectDistinctNums(final int n, final int len){
 		if(n == 0)
-			return null;
+			return new ArrayList<Integer>();
 		if(n == len){
 			ArrayList<Integer> temp = new ArrayList<Integer>();
 			for(int i = 0 ; i < len; i ++){
@@ -122,8 +122,7 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 		
 		if(n < len/2){
 			ArrayList<Integer> indexes = this.selectDistinctNums(n, len);
-			if(indexes == null)
-				return;
+			
 			for(int i = 0; i < indexes.size() ;  i++){
 				int index = indexes.get(i);
 				agents[index].setBankruptcy();
@@ -152,7 +151,7 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 			e.printStackTrace();
 		}
 		
-		for(int k = 0 ; k < 4 ; k++){
+		for(int k = 0 ; k < 5 ; k++){
 			final int counts = 100;
 			double[] incres = new double[counts];
 			double init_R_ratio = 0;
