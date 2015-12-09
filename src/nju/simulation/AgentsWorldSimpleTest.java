@@ -37,7 +37,7 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 	@Override
 	protected void initAgents() {
 		// TODO Auto-generated method stub 可以从文件读取也可以硬编码
-		double u = 1.5;// 破产阈值，u >0 , 
+		double u = 0.1;// 破产阈值系数，0 < u < 1 , 
 		double aerfa = 0.6;//破产传染逆向影响系数，  0<=aerfa<=1
 		double e = 2;// 周期回复最小值
 		double k = 4;// 周期回复速率指标。k越大，回复越慢(周期回复的值越小）。
@@ -152,7 +152,7 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 		}
 		
 		for(int k = 0 ; k < 5 ; k++){
-			final int counts = 100;
+			final int counts = 500;
 			double[] incres = new double[counts];
 			double init_R_ratio = 0;
 			

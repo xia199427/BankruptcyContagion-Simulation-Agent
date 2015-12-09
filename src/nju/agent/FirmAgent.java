@@ -20,18 +20,18 @@ public class FirmAgent {
 	/**
 	 * 
 	 * @param id，	agent的id作为识别依据
-	 * @param u，	agent的破产阈值U	 
-	 * @param aerfa	逆向影响的衰减系数α
-	 * @param c，	agent的初始资产C
-	 * @param e，	agent周期回复的最小值ε
-	 * @param k，	agent回复速率指标k
+	 * @param f_u，	agent的破产阈值系数, 0 < f_u < 1	 
+	 * @param aerfa	逆向影响的衰减系数α, 0 <= α <= 1
+	 * @param c，	agent的初始资产C, c > 0
+	 * @param e，	agent周期回复的最小值ε, ε > 0
+	 * @param k，	agent回复速率指标k, k > 0
 	 */
-	public FirmAgent(String id, double u, double aerfa, double c, double e, double k){
+	public FirmAgent(String id, double f_u, double aerfa, double c, double e, double k){
 		this.id = id;
 		
 		beRespCom = new BankruptEventResponseCom(this, aerfa);
 		assetsCom = new AssetsCom(this, c, e, k);
-		brdCom = new BankruptDetectCom(this, u);
+		brdCom = new BankruptDetectCom(this, f_u * c);
 		
 		register_map.put(beRespCom.getClass().getName(), beRespCom);
 		register_map.put(assetsCom.getClass().getName(), assetsCom);
