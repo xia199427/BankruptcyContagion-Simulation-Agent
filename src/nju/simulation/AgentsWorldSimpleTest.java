@@ -78,7 +78,6 @@ public class AgentsWorldSimpleTest extends AgentsWorld{
 			
 		}
 		
-		timestep = 0;
 		
 		System.out.println("一次模拟结束");
 		
